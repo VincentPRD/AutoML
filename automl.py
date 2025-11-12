@@ -6,11 +6,17 @@ import os
 from sklearn import datasets, svm, metrics
 from sklearn.model_selection import train_test_split # Permet de séparer un jeu de données en un ensemble d'entrainements et un ensemble de tests.
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.metrics import classification_report, accuracy_score
+from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.metrics import confusion_matrix # Matrice de confusion pour visualiser les performances du modèle
 from sklearn.metrics import multilabel_confusion_matrix
 from sklearn.preprocessing import MinMaxScaler
+
+
+from sklearn.metrics import mean_squared_error, r2_score
+
 
 BINAIRE = 0
 MONOLABEL = 1
@@ -92,42 +98,60 @@ class AutoML:
         else:
             print("Il s'agit d'un problème de régression !\n")
             self.probleme = REGRESSION
-    
-    def eval(self):
-        
-        self.cherche_type_probleme()
-        
-        classifieur = RandomForestClassifier(random_state=42)
+   
+    def eval_regression(self):
+        modele = RandomForestRegressor(random_state=42)
 
-        if(self.probleme == BINAIRE):
-            classifieur.fit(self.X_train, self.y_train.squeeze())
-        elif((self.probleme == MULTILABELS) or (self.probleme == MULTICLASSES)):
-            classifieur = MultiOutputClassifier(classifieur)
-            classifieur.fit(self.X_train, self.y_train)
-        
+        modele.fit(self.X_train, self.y_train.squeeze())
+
         #
         # Prédictions sur l'ensemble de test.
         #
-        y_pred = classifieur.predict(self.X_test)
-        
-        #
-        # Évaluation du modèle RandomForest.
-        #
-        print(classification_report(self.y_test, y_pred, zero_division=0))
-        print(f"Accuracy : {accuracy_score(self.y_test, y_pred)}")
-
-        
-        matrices_confusions = multilabel_confusion_matrix(self.y_test, y_pred)
+        y_pred = modele.predict(self.X_test)
 
         #
-        # Visualisation des matrices de confusions.
+        # Évaluation du modèle.
         #
-        for i, matrice_confusion in enumerate(matrices_confusions):
-            sns.heatmap(matrice_confusion, annot=True, fmt="d", cmap="Blues")
-            plt.title(f"Matrice de confusion pour le label {i}")
-            plt.ylabel("Labels réels")
-            plt.xlabel("Labels prédits")
-            plt.show()
+        print(f"Mean Squared Error (MSE) : {mean_squared_error(self.y_test, y_pred)}")
+        print(f"R² Score : {r2_score(self.y_test, y_pred)}")
+
+    def eval(self):
+        
+        self.cherche_type_probleme()
+
+        if(self.probleme == REGRESSION):
+            self.eval_regression()
+        else:
+            modele = RandomForestClassifier(random_state=42)
+
+            if((self.probleme == MULTILABELS) or (self.probleme == MULTICLASSES)):
+                modele = MultiOutputClassifier(modele)
+                modele.fit(self.X_train, self.y_train)
+            else:
+                modele.fit(self.X_train, self.y_train.squeeze())
+        
+            #
+            # Prédictions sur l'ensemble de test.
+            #
+            y_pred = modele.predict(self.X_test)
+            
+            #
+            # Évaluation du modèle.
+            #
+            print(classification_report(self.y_test, y_pred, zero_division=0))
+            print(f"Accuracy : {accuracy_score(self.y_test, y_pred)}")
+
+            matrices_confusions = multilabel_confusion_matrix(self.y_test, y_pred)
+    
+            #
+            # Visualisation des matrices de confusions.
+            #
+            for i, matrice_confusion in enumerate(matrices_confusions):
+                sns.heatmap(matrice_confusion, annot=True, fmt="d", cmap="Blues")
+                plt.title(f"Matrice de confusion pour le label {i}")
+                plt.ylabel("Labels réels")
+                plt.xlabel("Labels prédits")
+                plt.show()
 
 
 
