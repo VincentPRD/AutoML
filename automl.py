@@ -14,10 +14,6 @@ from sklearn.metrics import confusion_matrix # Matrice de confusion pour visuali
 from sklearn.metrics import multilabel_confusion_matrix
 from sklearn.preprocessing import MinMaxScaler
 
-
-from sklearn.metrics import mean_squared_error, r2_score
-
-
 BINAIRE = 0
 MONOLABEL = 1
 MULTICLASSES = 2
@@ -124,12 +120,15 @@ class AutoML:
         else:
             modele = RandomForestClassifier(random_state=42)
 
-            if((self.probleme == MULTILABELS) or (self.probleme == MULTICLASSES)):
+            if(self.probleme == MULTILABELS):
                 modele = MultiOutputClassifier(modele)
+            
+            if((self.probleme == MULTILABELS) or (self.probleme == MULTICLASSES)):
                 modele.fit(self.X_train, self.y_train)
             else:
                 modele.fit(self.X_train, self.y_train.squeeze())
-        
+                
+
             #
             # Prédictions sur l'ensemble de test.
             #
