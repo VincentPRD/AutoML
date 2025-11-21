@@ -21,10 +21,12 @@ MULTILABELS = 3
 REGRESSION = 4
 
 class AutoML:
+    
     #
     # Chargement des données.
     #
     def chargement_donnees(self, data_dest):
+        
         #
         # Affecte dans un dictionnaire les différents fichiers à un mot clé.
         #
@@ -57,24 +59,15 @@ class AutoML:
 
         df = df.drop_duplicates() # Supprime les doublons.
 
+        #
         # Normalise les données.
+        #
         df.columns = df.columns.astype(str)
         scaler = MinMaxScaler()
         df[df.columns] = scaler.fit_transform(df[df.columns])
         
         self.df_data = df.loc[:, :'A'].drop(columns='A')
         self.df_solution = df.loc[:, 'A':]
-
-    #
-    # Préparation des données et séparation en sous ensemble train et test.
-    #
-    def fit(self, data_dest):
-        self.chargement_donnees(data_dest)
-        self.nettoyage_donnees()
-        #
-        # Sépare les données en sous ensemble train et test.
-        #
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.df_data, self.df_solution, test_size=0.3, random_state=42)
 
     def cherche_type_probleme(self):
         nb_colonnes = self.df_solution.shape[1]
@@ -94,53 +87,61 @@ class AutoML:
         else:
             print("Il s'agit d'un problème de régression !\n")
             self.probleme = REGRESSION
-   
-    def eval_regression(self):
-        modele = RandomForestRegressor(random_state=42)
 
-        modele.fit(self.X_train, self.y_train.squeeze())
+    def fit_binaire_monolabel(self):
+        self.modele = RandomForestClassifier(random_state=42)
+        self.modele.fit(self.X_train, self.y_train.squeeze())
 
+    def fit_multiclasses(self):
+        self.modele = RandomForestClassifier(random_state=42)
+        self.modele.fit(self.X_train, self.y_train)
+
+    def fit_multilabels(self):
+        self.modele = RandomForestClassifier(random_state=42)
+        self.modele = MultiOutputClassifier(self.modele)
+        self.modele.fit(self.X_train, self.y_train)    
+        
+    def fit_regression(self):
+        self.modele = RandomForestRegressor(random_state=42)
+        self.modele.fit(self.X_train, self.y_train.squeeze())
+
+    #
+    # Préparation des données et séparation en sous ensemble train et test.
+    #
+    def fit(self, data_dest):
+        self.chargement_donnees(data_dest)
+        self.nettoyage_donnees()
+        self.cherche_type_probleme()
+        
         #
-        # Prédictions sur l'ensemble de test.
+        # Sépare les données en sous ensemble train et test.
         #
-        y_pred = modele.predict(self.X_test)
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.df_data, self.df_solution, test_size=0.3, random_state=42)
+
+        if(self.probleme == BINAIRE or self.probleme == MONOLABEL):
+            self.fit_binaire_monolabel()
+        elif(self.probleme == MULTICLASSES):
+            self.fit_multiclasses()
+        elif(self.probleme == MULTILABELS):
+            self.fit_multilabels()
+        else:
+            self.fit_regression()
+                
+        self.y_pred = self.modele.predict(self.X_test) # Prédictions sur l'ensemble de test.
+
+    def eval(self):
 
         #
         # Évaluation du modèle.
         #
-        print(f"Mean Squared Error (MSE) : {mean_squared_error(self.y_test, y_pred)}")
-        print(f"R² Score : {r2_score(self.y_test, y_pred)}")
-
-    def eval(self):
-        
-        self.cherche_type_probleme()
-
         if(self.probleme == REGRESSION):
-            self.eval_regression()
+            print(f"Mean Squared Error (MSE) : {mean_squared_error(self.y_test, self.y_pred)}")
+            print(f"R² Score : {r2_score(self.y_test, self.y_pred)}")
         else:
-            modele = RandomForestClassifier(random_state=42)
+            print(classification_report(self.y_test, self.y_pred, zero_division=0))
+            print(f"Accuracy : {accuracy_score(self.y_test, self.y_pred)}")
 
-            if(self.probleme == MULTILABELS):
-                modele = MultiOutputClassifier(modele)
-            
-            if((self.probleme == MULTILABELS) or (self.probleme == MULTICLASSES)):
-                modele.fit(self.X_train, self.y_train)
-            else:
-                modele.fit(self.X_train, self.y_train.squeeze())
-                
-
-            #
-            # Prédictions sur l'ensemble de test.
-            #
-            y_pred = modele.predict(self.X_test)
-            
-            #
-            # Évaluation du modèle.
-            #
-            print(classification_report(self.y_test, y_pred, zero_division=0))
-            print(f"Accuracy : {accuracy_score(self.y_test, y_pred)}")
-
-            matrices_confusions = multilabel_confusion_matrix(self.y_test, y_pred)
+            matrices_confusions = multilabel_confusion_matrix(self.y_test, self.y_pred)
     
             #
             # Visualisation des matrices de confusions.
