@@ -7,7 +7,7 @@ L’objectif est de développer une **pipeline AutoML** permettant d’automatis
 - L’apprentissage de différents modèles avec **scikit-learn**  
 - L’optimisation des hyperparamètres  
 - L’évaluation des modèles avec des métriques adaptées
-- 
+
 ---
 
 ## Fonctionnalités principales
