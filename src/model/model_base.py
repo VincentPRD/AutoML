@@ -22,6 +22,7 @@ from sklearn.linear_model import (LogisticRegression, SGDClassifier,
     PassiveAggressiveClassifier, SGDRegressor
 )
 from sklearn.svm import SVR, SVC, LinearSVC
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import (
     accuracy_score, f1_score, roc_auc_score, root_mean_squared_error,
@@ -87,7 +88,8 @@ def cherche_type_probleme(
                     "RandomForest": RandomForestClassifier(n_jobs=-1, n_estimators=100, random_state=42),
                     "LogisticRegression": LogisticRegression(max_iter=500, random_state=42),
                     "SGD": SGDClassifier(loss='hinge', n_jobs=-1, random_state=42),
-                    "HistGradientBoosting": HistGradientBoostingClassifier(max_iter=300, random_state=42)
+                    "HistGradientBoosting": HistGradientBoostingClassifier(max_iter=300, random_state=42),
+                    "KNN": KNeighborsClassifier(n_neighbors=7)
                 }
             else:
                 models = {
