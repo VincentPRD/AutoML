@@ -3,9 +3,9 @@
 ## Contexte
 Ce projet s’inscrit dans le cadre du module **Méthodologie IA et Méthodes Classiques (M1 INFO – IA)**.  
 L’objectif est de développer une **pipeline AutoML** permettant d’automatiser :
-- La préparation et séparation des données (train/valid/test)  
+- La préparation et séparation des données (train/dev/test)  
 - L’apprentissage de différents modèles avec **scikit-learn**  
-- L’optimisation des hyperparamètres  
+- L’optimisation des hyperparamètres
 - L’évaluation des modèles avec des métriques adaptées
 
 ---
@@ -14,13 +14,14 @@ L’objectif est de développer une **pipeline AutoML** permettant d’automatis
 - Chargement et prétraitement des jeux de données  
 - Sélection automatique de modèles (classification, régression, etc.)  
 - Optimisation des hyperparamètres (GridSearchCV, RandomizedSearchCV, etc.)  
-- Évaluation avec métriques adaptées (accuracy, F1-score, RMSE, etc.)  
+- Évaluation avec métriques adaptées (accuracy, F1-score, RMSE, etc.)
+- Prédiction automatique sur de nouveaux jeux de données via ```predict()```
 - Interface utilisateur minimale :
 ```python
 import automl
 data_dest_traindev="/info/corpus/ChallengeMachineLearning/data_test/data.data"
 automl.fit(data_dest_traindev)
-automl.eval()  # Renvoie des résultats d'évaluation
+automl.eval()
 path_to_testset = "/info/corpus/ChallengeMachineLearning/data_test/data_test.data"
-automl.predict(path_to_testset) #retourne une liste avec les predictions par donnée du dataset (donc par ligne de donnée)
+automl.predict(path_to_testset)
 ```
