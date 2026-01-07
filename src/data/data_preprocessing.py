@@ -190,6 +190,9 @@ def split_data(
             test_size=0.3, 
             random_state=42
         )
+
+    # On sépare le jeu de test en 2 afin de récupérer un jeu de développement
+    X_test, X_dev, y_test, y_dev = train_test_split(X_test, y_test, test_size=0.66, random_state=42)
         
     # Aplatissage du vecteur cible (y) si nécessaire.
     # Scikit-learn préfère des vecteurs 1D (shape (n,)) pour la classification/régression simple.
@@ -198,4 +201,4 @@ def split_data(
         y_train = np.ravel(y_train)
         y_test = np.ravel(y_test)
         
-    return X_train, X_test, y_train, y_test
+    return X_train, X_test, X_dev, y_train, y_test, y_dev

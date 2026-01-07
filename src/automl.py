@@ -57,8 +57,10 @@ class AutoML:
         # Données transformées et splits
         self.X_train_trans = None
         self.X_test_trans = None
+        self.X_dev = None
         self.y_train = None
         self.y_test = None
+        self.y_dev = None
 
         self.results = {}
         self.preprocessor = None
@@ -114,9 +116,8 @@ class AutoML:
         if not self.is_sparse:
             self.df_data = nettoyer_data_types(self.df_data, self.df_probleme)
 
-        X_train, X_test, self.y_train, self.y_test = split_data(
-            self.df_data, self.df_solution, self.model_info
-        )
+        X_train, X_test, self.X_dev, self.y_train, self.y_test, self.y_dev = split_data(self.df_data, 
+                                                                                        self.df_solution, self.model_info)
 
         # 4. Préprocessing : Transformation (via module data_preprocessing)
         print("Configuration du Preprocessing...")
@@ -136,7 +137,7 @@ class AutoML:
         )
         
         # Sélection du meilleur modèle selon les métriques définies
-        self.best_model_name = choisir_meilleur_model(self.results, self.y_test, self.model_info)
+        self.best_model_name = choisir_meilleur_model(self.results, self.y_test, self.model_info, False)
         # On sauvegarde l'objet modèle initial comme "meilleur" par défaut
         if self.best_model_name in self.results:
             self.best_model_obj = self.results[self.best_model_name]
@@ -145,14 +146,13 @@ class AutoML:
         print(f"\n--- Optimisation du meilleur modèle : {self.best_model_name} ---")
         optimize = AutoOptimizer()
         best_model_name_optimized, best_params = optimize.optimize(
-            self.X_train_trans, 
-            self.y_train, 
+            self.X_dev, 
+            self.y_dev, 
             self.model_info, 
             self.best_model_name
         )
         
-        # TODO : Implémenter la reconstruction finale du modèle avec les hyperparamètres optimisés
-        # self._build_final_model(best_model_name_optimized, best_params)
+        self.best_model_obj = self._build_final_model(best_model_name_optimized, best_params)
 
     def eval(self) -> None:
         """
@@ -167,7 +167,7 @@ class AutoML:
             return
 
         # Du module model_base
-        choisir_meilleur_model(self.results, self.y_test, self.model_info)
+        choisir_meilleur_model(self.results, self.y_test, self.model_info, True)
 
     def predict(self, data_dest: str):
         """
@@ -207,25 +207,29 @@ class AutoML:
                 df_to_predict = nettoyer_data_types(df_to_predict, metadata)
         else:
             raise ValueError("Format d'entrée non reconnu (attendu: str path).")
-            
+
+        
         # 2. Transformation et Prédiction
         try:
             # IMPORTANT : Toujours utiliser transform(), jamais fit_transform() sur les données de test
             X_pred = self.preprocessor.transform(df_to_predict)
-            predictions = self.best_model_obj.predict(X_pred)
+            predictions = self.best_model_obj['model_obj'].predict(X_pred)
             return predictions
         except Exception as e:
             print(f"Erreur lors de la prédiction : {e}")
             return None
-
+        
     def _build_final_model(self, model_name: str, params: dict):
         """
         Méthode interne pour reconstruire et réentraîner le modèle final 
-        avec les hyperparamètres optimisés (TODO).
+        avec les hyperparamètres optimisés.
         
         Args:
             model_name (str): Nom du modèle à construire.
             params (dict): Hyperparamètres optimisés.
         """
         print(f"Finalisation du modèle {model_name} avec les meilleurs paramètres.")
-        # Logique d'instanciation et de fit final ici...
+        is_classification = "classification" in self.model_info
+        
+        model = get_base_model_class(model_name, is_classification)
+        return model(**params)

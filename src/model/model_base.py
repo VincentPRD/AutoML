@@ -109,7 +109,7 @@ def cherche_type_probleme(
                     "RandomForest": MultiOutputClassifier(
                         RandomForestClassifier(n_jobs=-1, n_estimators=50, random_state=42)
                     ),
-                    "HisGradientBoosting": MultiOutputClassifier(
+                    "HistGradientBoosting": MultiOutputClassifier(
                         HistGradientBoostingClassifier(max_iter=100, random_state=42)
                     )
                 }   
@@ -238,7 +238,8 @@ def evaluate_models(
 def choisir_meilleur_model(
     results: Dict[str, Dict[str, Any]], 
     y_test: Any, 
-    model_info: Dict[str, Any]
+    model_info: Dict[str, Any],
+    affichage: bool
 ) -> Optional[str]:
     """
     Compare les modèles entraînés selon les métriques définies et sélectionne le meilleur.
@@ -256,8 +257,9 @@ def choisir_meilleur_model(
     """
     best_model_name = None
     best_avg_score = -np.inf
-    
-    print("\n--- Résultats de l'évaluation initiale ---")
+
+    if affichage:
+        print("\n--- Résultats de l'évaluation initiale ---")
     
     # Calcul de l'étendue des valeurs (Range) pour normaliser le RMSE
     y_range = 1.0
@@ -331,16 +333,24 @@ def choisir_meilleur_model(
             for k in model_info['metrics'] 
             if k in scores_bruts or k in scores_norm
         ])
-        
-        print(f"Modèle: {name:20} | Score Global: {avg_score:.4f} | Détails: [{details_str}]")
+
+        if affichage:
+            print(f"Modèle: {name:20} | Score Global: {avg_score:.4f} | Détails: [{details_str}]")
         
         if avg_score > best_avg_score:
             best_avg_score = avg_score
             best_model_name = name
 
-    if best_model_name:
-        print(f"\nMEILLEUR MODÈLE SÉLECTIONNÉ : {best_model_name} (Score initial: {best_avg_score:.4f})")
-    else:
-        print("\nAUCUN MODÈLE SÉLECTIONNÉ (Echec de toutes les évaluations).")
-        
+    if affichage:
+        if best_model_name:
+            print(f"\nMEILLEUR MODÈLE SÉLECTIONNÉ : {best_model_name} (Score initial: {best_avg_score:.4f})")
+        else:
+            print("\nAUCUN MODÈLE SÉLECTIONNÉ (Echec de toutes les évaluations).")
+            
     return best_model_name
+
+    
+
+
+    
+    
