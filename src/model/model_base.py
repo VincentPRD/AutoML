@@ -239,7 +239,9 @@ def choisir_meilleur_model(
     results: Dict[str, Dict[str, Any]], 
     y_test: Any, 
     model_info: Dict[str, Any],
-    affichage: bool
+    affichage: bool,
+    model=None,
+    model_name=None
 ) -> Optional[str]:
     """
     Compare les modèles entraînés selon les métriques définies et sélectionne le meilleur.
@@ -251,6 +253,7 @@ def choisir_meilleur_model(
         results (dict): Résultats retournés par evaluate_models.
         y_test (array-like): Véritables valeurs cibles du test.
         model_info (dict): Contient la liste des métriques à calculer.
+        affichage (bool): Booléen pour afficher les métriques.
 
     Returns:
         str: Le nom (clé) du meilleur modèle.
@@ -268,7 +271,7 @@ def choisir_meilleur_model(
         y_range = np.max(y_test_flat) - np.min(y_test_flat)
         if y_range == 0: 
             y_range = 1.0
-
+    
     for name, data in results.items():
         y_p = data["y_pred"]
         y_prob = data["y_proba"]

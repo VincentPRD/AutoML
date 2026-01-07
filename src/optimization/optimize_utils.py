@@ -26,55 +26,60 @@ def suggest_hyperparameters(trial, model_name):
     
     if model_name in ['RandomForest', 'RandomForestReg']:
         return {
-            'n_estimators': trial.suggest_int('rf_n_estimators', 100, 300, step=50),
-            'max_depth': trial.suggest_int('rf_max_depth', 8, 20, log=True),
-            'min_samples_split': trial.suggest_int('rf_samples_split', 2, 10),
-            'criterion': trial.suggest_categorical('rf_criterion', ['gini', 'entropy']) if model_name == 'RandomForest' else 'squared_error',
+            # On retire 'rf_' des noms internes Optuna
+            'n_estimators': trial.suggest_int('n_estimators', 100, 300, step=50),
+            'max_depth': trial.suggest_int('max_depth', 8, 20, log=True),
+            'min_samples_split': trial.suggest_int('min_samples_split', 2, 10),
+            'criterion': trial.suggest_categorical('criterion', ['gini', 'entropy']) if model_name == 'RandomForest' else 'squared_error',
             'random_state': 42
         }
     
     elif model_name == 'LogisticRegression':
         params = {
-            'penalty': trial.suggest_categorical('lr_penalty', ['l2', None]), 
+            'penalty': trial.suggest_categorical('penalty', ['l2', None]), 
             'solver': 'lbfgs',
             'max_iter': 1000,
             'random_state': 42
         }
         if params['penalty'] == 'l2':
-            params['C'] = trial.suggest_float('lr_C', 1e-5, 1e2, log=True)
+            # On retire 'lr_'
+            params['C'] = trial.suggest_float('C', 1e-5, 1e2, log=True)
         return params
         
     elif model_name in ['SVC', 'SVR']:
         return {
-            'C': trial.suggest_float('svc_C', 1e-2, 1e2, log=True),
-            'kernel': trial.suggest_categorical('svc_kernel', ['linear', 'rbf']), 
-            'gamma': trial.suggest_categorical('svc_gamma', ['scale', 'auto']),
+            # On retire 'svc_'
+            'C': trial.suggest_float('C', 1e-2, 1e2, log=True),
+            'kernel': trial.suggest_categorical('kernel', ['linear', 'rbf']), 
+            'gamma': trial.suggest_categorical('gamma', ['scale', 'auto']),
             'random_state': 42 
         }
         
     elif model_name in ['HistGradientBoosting', 'HistGradientBoostingReg']:
-        # Plages réduites pour accélérer l'optimisation
         return {
-            'max_leaf_nodes': trial.suggest_int('hgb_max_leaf_nodes', 20, 30),
-            'l2_regularization': trial.suggest_float('hgb_l2_reg', 1e-4, 1.0, log=True),
-            'max_depth': trial.suggest_int('hgb_max_depth', 3, 8),
-            'learning_rate': trial.suggest_float('hgb_learning_rate', 0.05, 0.15, log=True),
+            # On retire 'hgb_' -> C'était la cause directe de votre erreur
+            'max_leaf_nodes': trial.suggest_int('max_leaf_nodes', 20, 30),
+            'l2_regularization': trial.suggest_float('l2_regularization', 1e-4, 1.0, log=True),
+            'max_depth': trial.suggest_int('max_depth', 3, 8),
+            'learning_rate': trial.suggest_float('learning_rate', 0.05, 0.15, log=True),
             'random_state': 42
         }
         
     elif model_name in ['MLP', 'MLPReg']:
         return {
-            'hidden_layer_sizes': trial.suggest_categorical('mlp_hidden_layers', [(50, 50), (100,), (100, 50)]),
-            'activation': trial.suggest_categorical('mlp_activation', ['relu', 'tanh']),
-            'alpha': trial.suggest_float('mlp_alpha', 1e-4, 1e-2, log=True),
+            # On retire 'mlp_'
+            'hidden_layer_sizes': trial.suggest_categorical('hidden_layer_sizes', [(50, 50), (100,), (100, 50)]),
+            'activation': trial.suggest_categorical('activation', ['relu', 'tanh']),
+            'alpha': trial.suggest_float('alpha', 1e-4, 1e-2, log=True),
             'max_iter': 1000, 
             'random_state': 42
         }
     
     elif model_name == 'SGD': 
          return {
-             'alpha': trial.suggest_float('sgd_alpha', 1e-5, 1e-2, log=True),
-             'penalty': trial.suggest_categorical('sgd_penalty', ['l2', 'l1', 'elasticnet']),
+             # On retire 'sgd_'
+             'alpha': trial.suggest_float('alpha', 1e-5, 1e-2, log=True),
+             'penalty': trial.suggest_categorical('penalty', ['l2', 'l1', 'elasticnet']),
              'max_iter': 1000,
              'random_state': 42
          }

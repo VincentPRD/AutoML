@@ -101,7 +101,6 @@ class AutoOptimizer:
             
             print("\n=============================================")
             print(f"OPTIMISATION TERMINÉE pour: {model_name}")
-            print(f"Meilleur Score ({target_metric_name}): {best_global_score:.4f}")
             print("=============================================")
-        
+            
         return model_name, best_params

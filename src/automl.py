@@ -11,9 +11,12 @@ import warnings
 import numpy as np
 import pandas as pd
 import scipy.sparse
+from sklearn.multioutput import MultiOutputClassifier, MultiOutputRegressor
+from sklearn.compose import TransformedTargetRegressor 
 
 # Imports locaux
 from optimization.optimize_unique import AutoOptimizer
+from optimization.optimize_utils import get_base_model_class, suggest_hyperparameters
 from data.data_io import chargement_donnees_complet
 from data.data_preprocessing import nettoyer_data_types, prepare_preprocessor, split_data
 from model.model_base import cherche_type_probleme, evaluate_models, choisir_meilleur_model
@@ -52,6 +55,7 @@ class AutoML:
         self.model_info = None
         self.models = {}
         self.best_model_name = None
+        self.best_model_name_optimized = None
         self.best_model_obj = None 
         
         # Données transformées et splits
@@ -145,14 +149,14 @@ class AutoML:
         # 6. Optimisation (via module optimization)
         print(f"\n--- Optimisation du meilleur modèle : {self.best_model_name} ---")
         optimize = AutoOptimizer()
-        best_model_name_optimized, best_params = optimize.optimize(
+        self.best_model_name_optimized, best_params = optimize.optimize(
             self.X_dev, 
             self.y_dev, 
             self.model_info, 
             self.best_model_name
         )
         
-        self.best_model_obj = self._build_final_model(best_model_name_optimized, best_params)
+        self.best_model_obj = self._build_final_model(self.best_model_name_optimized, best_params)
 
     def eval(self) -> None:
         """
@@ -165,9 +169,10 @@ class AutoML:
         if not self.results:
             raise Exception("Aucun modèle n'a été entraîné.")
             return
-
+        
         # Du module model_base
-        choisir_meilleur_model(self.results, self.y_test, self.model_info, True)
+        choisir_meilleur_model(self.results, self.y_test, self.model_info, True, 
+                               model=self.best_model_obj, model_name=self.best_model_name)
 
     def predict(self, data_dest: str):
         """
@@ -229,7 +234,34 @@ class AutoML:
             params (dict): Hyperparamètres optimisés.
         """
         print(f"Finalisation du modèle {model_name} avec les meilleurs paramètres.")
-        is_classification = "classification" in self.model_info
+        is_multi_output = "multi-sortie" in self.model_info['type'] or "multi-label" in self.model_info['type']
+        is_classification = "classification" in self.model_info['type']
         
-        model = get_base_model_class(model_name, is_classification)
-        return model(**params)
+        BaseEstimatorClass = get_base_model_class(model_name, is_classification)
+        
+        base_estimator = BaseEstimatorClass(**params)
+        model = base_estimator
+        
+        if is_multi_output:
+            if is_classification:
+                if not hasattr(base_estimator, 'classes_'): 
+                    model = MultiOutputClassifier(base_estimator)
+            elif not hasattr(base_estimator, 'n_outputs_'):
+                 model = MultiOutputRegressor(base_estimator)
+
+        if not is_classification and not is_multi_output:
+            if model_name in ['SVR', 'HistGradientBoostingReg', 'MLPReg']:
+                model = TransformedTargetRegressor(regressor=base_estimator, transformer=StandardScaler())
+
+
+        self.best_model_name_optimized += "_optimized"
+        self.results.update(evaluate_models(
+                                            {self.best_model_name_optimized: model}, 
+                                            self.X_train_trans, self.y_train, 
+                                            self.X_test_trans, self.y_test, 
+                                            self.model_info
+                                            ))
+
+        
+        
+        
