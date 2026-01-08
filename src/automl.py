@@ -13,6 +13,7 @@ import pandas as pd
 import scipy.sparse
 from sklearn.multioutput import MultiOutputClassifier, MultiOutputRegressor
 from sklearn.compose import TransformedTargetRegressor 
+from sklearn.preprocessing import StandardScaler
 
 # Imports locaux
 from optimization.optimize_unique import AutoOptimizer
@@ -262,6 +263,8 @@ class AutoML:
                                             self.model_info
                                             ))
 
+
+        return self.results[self.best_model_name_optimized]
         
         
         
