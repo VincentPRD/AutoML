@@ -25,3 +25,8 @@ automl.eval()
 path_to_testset = "/info/corpus/ChallengeMachineLearning/data_test/data_test.data"
 automl.predict(path_to_testset)
 ```
+
+## Installation des dépendances
+```python
+pip install -r requirements.txt
+```
