@@ -8,7 +8,7 @@ Ce module contient les fonctions pour :
 4. Sélectionner le meilleur modèle selon un score agrégé.
 """
 
-from typing import Dict, Any, List, Union, Optional
+from typing import Dict, Any, Optional
 
 import numpy as np
 import pandas as pd
@@ -21,7 +21,7 @@ from sklearn.multioutput import MultiOutputClassifier, MultiOutputRegressor, Cla
 from sklearn.linear_model import (LogisticRegression, SGDClassifier, 
     PassiveAggressiveClassifier, SGDRegressor
 )
-from sklearn.svm import SVR, SVC, LinearSVC
+from sklearn.svm import LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import (
