@@ -13,7 +13,7 @@ L’objectif est de développer une **pipeline AutoML** permettant d’automatis
 ## Fonctionnalités principales
 - Chargement et prétraitement des jeux de données  
 - Sélection automatique de modèles (classification, régression, etc.)  
-- Optimisation des hyperparamètres (GridSearchCV, RandomizedSearchCV, etc.)  
+- Optimisation des hyperparamètres (optuna)  
 - Évaluation avec métriques adaptées (accuracy, F1-score, RMSE, etc.)
 - Prédiction automatique sur de nouveaux jeux de données via ```predict()```
 - Interface utilisateur minimale :
