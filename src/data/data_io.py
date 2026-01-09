@@ -11,7 +11,6 @@ import traceback
 from io import BytesIO
 from typing import Tuple, Optional, Union
 
-import numpy as np
 import pandas as pd
 import scipy.sparse
 from sklearn.datasets import load_svmlight_file
@@ -153,7 +152,7 @@ def chargement_donnees_complet(
     is_sparse = False
     
     try:
-        # Extraction robuste du nom du dataset à partir du chemin
+        # Extraction du nom du dataset à partir du chemin
         # Gère les chemins finissant par '/' ou non
         name = data_dest.rstrip('/').split(sep='/')[-1]
         if name == "": 
@@ -166,18 +165,18 @@ def chargement_donnees_complet(
             'type': os.path.join(data_dest, name + '.type')
         }
 
-        # 1. Chargement des données (.data)
+        # Chargement des données (.data)
         if not os.path.exists(fichiers['data']):
             print(f"Erreur : Fichier introuvable -> {fichiers['data']}")
             return None, None, None, False
             
         df_data, is_sparse = _detecte_et_charge_data(fichiers['data'])
         
-        # 2. Chargement des métadonnées (.type)
+        # Chargement des métadonnées (.type)
         if os.path.exists(fichiers['type']):
             df_probleme = pd.read_csv(fichiers['type'], sep=r'\s+', header=None, names=['Type'])
             
-        # 3. Chargement de la solution (.solution)
+        # Chargement de la solution (.solution)
         if load_solution:
             if not os.path.exists(fichiers['solution']):
                 # Si le fichier solution n'est pas trouvé ce n'est pas bloquant
@@ -199,5 +198,4 @@ def chargement_donnees_complet(
     except Exception as e:
         print(f"Erreur lors du chargement des données : {e}")
         traceback.print_exc()
-        # En cas d'erreur, on retourne un tuple vide cohérent
         return None, None, None, False

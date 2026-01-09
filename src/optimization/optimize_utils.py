@@ -26,7 +26,6 @@ def suggest_hyperparameters(trial, model_name):
     
     if model_name in ['RandomForest', 'RandomForestReg']:
         return {
-            # On retire 'rf_' des noms internes Optuna
             'n_estimators': trial.suggest_int('n_estimators', 100, 300, step=50),
             'max_depth': trial.suggest_int('max_depth', 8, 20, log=True),
             'min_samples_split': trial.suggest_int('min_samples_split', 2, 10),
@@ -42,13 +41,11 @@ def suggest_hyperparameters(trial, model_name):
             'random_state': 42
         }
         if params['penalty'] == 'l2':
-            # On retire 'lr_'
             params['C'] = trial.suggest_float('C', 1e-5, 1e2, log=True)
         return params
         
     elif model_name in ['SVC', 'SVR']:
         return {
-            # On retire 'svc_'
             'C': trial.suggest_float('C', 1e-2, 1e2, log=True),
             'kernel': trial.suggest_categorical('kernel', ['linear', 'rbf']), 
             'gamma': trial.suggest_categorical('gamma', ['scale', 'auto']),
@@ -57,7 +54,6 @@ def suggest_hyperparameters(trial, model_name):
         
     elif model_name in ['HistGradientBoosting', 'HistGradientBoostingReg']:
         return {
-            # On retire 'hgb_' -> C'était la cause directe de votre erreur
             'max_leaf_nodes': trial.suggest_int('max_leaf_nodes', 20, 30),
             'l2_regularization': trial.suggest_float('l2_regularization', 1e-4, 1.0, log=True),
             'max_depth': trial.suggest_int('max_depth', 3, 8),
@@ -67,7 +63,6 @@ def suggest_hyperparameters(trial, model_name):
         
     elif model_name in ['MLP', 'MLPReg']:
         return {
-            # On retire 'mlp_'
             'hidden_layer_sizes': trial.suggest_categorical('hidden_layer_sizes', [(50, 50), (100,), (100, 50)]),
             'activation': trial.suggest_categorical('activation', ['relu', 'tanh']),
             'alpha': trial.suggest_float('alpha', 1e-4, 1e-2, log=True),
@@ -77,7 +72,6 @@ def suggest_hyperparameters(trial, model_name):
     
     elif model_name == 'SGD': 
          return {
-             # On retire 'sgd_'
              'alpha': trial.suggest_float('alpha', 1e-5, 1e-2, log=True),
              'penalty': trial.suggest_categorical('penalty', ['l2', 'l1', 'elasticnet']),
              'max_iter': 1000,
@@ -87,7 +81,7 @@ def suggest_hyperparameters(trial, model_name):
     return {}
 
 def get_base_model_class(model_name, is_classification):
-    """ Renvoie la classe Scikit-learn de base pour l'estimateur. """
+    """ Renvoie la classe Scikit-learn selon le type de problème. """
     
     if is_classification:
         if model_name == 'RandomForest': return RandomForestClassifier
