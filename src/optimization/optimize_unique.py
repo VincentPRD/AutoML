@@ -1,11 +1,9 @@
-import numpy as np
 import optuna
 import warnings
 from sklearn.model_selection import cross_val_score
 from sklearn.multioutput import MultiOutputClassifier, MultiOutputRegressor
 from sklearn.compose import TransformedTargetRegressor 
-from sklearn.preprocessing import StandardScaler 
-from sklearn.base import RegressorMixin, ClassifierMixin 
+from sklearn.preprocessing import StandardScaler
 
 from .optimize_utils import SCORING_MAP, suggest_hyperparameters, get_base_model_class 
 
@@ -114,10 +112,8 @@ class AutoOptimizer:
         
         if not best_trial or best_trial.state != optuna.trial.TrialState.COMPLETE:
             print("\nAucun essai n'a été complété avec succès. Retour des paramètres vides.")
-            best_global_score = None
             best_params = {}
         else:
-            best_global_score = study.best_value
             best_params = study.best_params
             
             print("\n=============================================")

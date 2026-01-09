@@ -1,5 +1,4 @@
 import numpy as np
-import optuna
 from sklearn.metrics import make_scorer, mean_squared_error
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.ensemble import HistGradientBoostingClassifier, HistGradientBoostingRegressor

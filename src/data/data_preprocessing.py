@@ -18,10 +18,7 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.impute import SimpleImputer
 
 
-def nettoyer_data_types(
-    df_data: Optional[pd.DataFrame], 
-    df_probleme: Optional[pd.DataFrame]
-) -> Optional[pd.DataFrame]:
+def nettoyer_data_types(df_data: Optional[pd.DataFrame], df_probleme: Optional[pd.DataFrame]) -> Optional[pd.DataFrame]:
     """
     Nettoie et convertit les types de données des colonnes pour les DataFrames denses.
 
@@ -37,7 +34,7 @@ def nettoyer_data_types(
     Returns:
         pd.DataFrame | None: Le DataFrame nettoyé.
     """
-    # Vérifications de sécurité
+    # Vérification de sécurité
     if df_data is None or df_probleme is None:
         return df_data
     
@@ -88,9 +85,7 @@ def prepare_preprocessor(
         # On applique un scaling global.
         # IMPORTANT : with_mean=False est obligatoire pour ne pas "densifier" la matrice
         # (ce qui exploserait la mémoire RAM).
-        return Pipeline(steps=[
-            ('scaler', StandardScaler(with_mean=False)) 
-        ])
+        return Pipeline(steps=[('scaler', StandardScaler(with_mean=False))])
 
     # === CAS 2 : DONNÉES DENSE (DataFrame Pandas) ===
     numeric_features: List[str] = []
@@ -174,6 +169,7 @@ def split_data(
         stratify = df_solution
     
     try:
+        # Première tentative avec stratification
         X_train, X_test, y_train, y_test = train_test_split(
             df_data, 
             df_solution, 
