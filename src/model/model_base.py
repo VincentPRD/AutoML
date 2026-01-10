@@ -32,10 +32,7 @@ from sklearn.compose import TransformedTargetRegressor
 from sklearn.preprocessing import StandardScaler
 
 
-def cherche_type_probleme(
-    df_solution: pd.DataFrame, 
-    is_sparse: bool
-) -> Dict[str, Any]:
+def cherche_type_probleme(df_solution: pd.DataFrame, is_sparse: bool) -> Dict[str, Any]:
     """
     Détermine le type de tâche ML (Classification/Régression) et initialise les modèles.
 
@@ -183,8 +180,7 @@ def evaluate_models(
     models: Dict[str, Any], 
     X_train_trans: Any, 
     y_train: Any, 
-    X_test_trans: Any, 
-    y_test: Any, 
+    X_test_trans: Any,
     model_info: Dict[str, Any]
 ) -> Dict[str, Dict[str, Any]]:
     """
@@ -239,9 +235,7 @@ def choisir_meilleur_model(
     results: Dict[str, Dict[str, Any]], 
     y_test: Any, 
     model_info: Dict[str, Any],
-    affichage: bool,
-    model=None,
-    model_name=None
+    affichage: bool
 ) -> Optional[str]:
     """
     Compare les modèles entraînés selon les métriques définies et sélectionne le meilleur.
@@ -351,9 +345,3 @@ def choisir_meilleur_model(
             print("\nAUCUN MODÈLE SÉLECTIONNÉ (Echec de toutes les évaluations).")
             
     return best_model_name
-
-    
-
-
-    
-    

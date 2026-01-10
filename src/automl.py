@@ -137,8 +137,7 @@ class AutoML:
         self.results = evaluate_models(
             self.models, 
             self.X_train_trans, self.y_train, 
-            self.X_test_trans, self.y_test, 
-            self.model_info
+            self.X_test_trans, self.model_info
         )
         
         # Sélection du meilleur modèle selon les métriques définies
@@ -172,8 +171,7 @@ class AutoML:
             return
         
         # Du module model_base
-        choisir_meilleur_model(self.results, self.y_test, self.model_info, True, 
-                               model=self.best_model_obj, model_name=self.best_model_name)
+        choisir_meilleur_model(self.results, self.y_test, self.model_info, True)
 
     def predict(self, data_dest: str):
         """
@@ -259,12 +257,8 @@ class AutoML:
         self.results.update(evaluate_models(
                                             {self.best_model_name_optimized: model}, 
                                             self.X_train_trans, self.y_train, 
-                                            self.X_test_trans, self.y_test, 
-                                            self.model_info
+                                            self.X_test_trans, self.model_info
                                             ))
 
 
         return self.results[self.best_model_name_optimized]
-        
-        
-        
