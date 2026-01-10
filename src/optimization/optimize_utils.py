@@ -94,10 +94,10 @@ def suggest_hyperparameters(trial, model_name):
 
 def get_base_model_class(model_name, is_classification):
     """
-    Assure le mapping (faire de la correspondance) entre le nom du modèle (sous forme de chaîne de caractères) 
+    Assure le mapping (faire de la correspondance) entre le nom du modèle (chaîne de caractères) 
     et sa classe réelle dans Scikit-learn. 
     
-    Cette fonction est nécessaire pour l'instanciation dynamique (créer un objet à partir d'une clase) : 
+    Cette fonction est nécessaire pour l'instanciation dynamique (créer un objet à partir d'une classe) : 
     elle  permet à  l'optimiseur de récupérer le bon constructeur selon que la tâche est une classification
     ou une régression, afin de créer un nouvel objet modèle à chaque itération de recherche d'hyperparamètres.
     """
