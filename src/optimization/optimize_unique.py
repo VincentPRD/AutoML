@@ -33,17 +33,15 @@ class AutoOptimizer:
     
     def objective(self, trial, X_train, y_train, task_type, target_metric_name, model_name):
         """
-        Fonction objective pour Optuna. Elle construit le modèle avec les wrappers si nécessaire.
-
-        Args : 
-            Trial : ce qui va gérer le choix des hyperparamètres dans un intervalle
-            X_train : les données d'entrainement
-            y_train : les labels associés au données
-            task_type : un dictionnaire contenant les informations relatives à la tâche
-            target_metric_name : la métrique utilisé discriminer les itérations de l'optimisation
-
-        Returns :
-            Score du modèle pour une itération
+        On est sur le "coeur" de la boucle d'optimisation d'Optuna. 
+        
+        Cette fonction est exécutée à chaque itération pour évaluer une nouvelle combinaison 
+        d'hyperparamètres. Elle gère l'instanciation dynamique du modèle et l'adapte 
+        automatiquement à la structure des données.
+        
+        Le score final est calculé par validation croisée (cross-validation), ce qui permet 
+        de mesurer la performance réelle et la robustesse du modèle sur différentes 
+        portions des données.
         """
         
         is_multi_output = "multi-sortie" in task_type or "multi-label" in task_type

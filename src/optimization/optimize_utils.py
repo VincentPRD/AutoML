@@ -6,6 +6,7 @@ from sklearn.ensemble import HistGradientBoostingClassifier, HistGradientBoostin
 from sklearn.linear_model import LogisticRegression, SGDClassifier, SGDRegressor
 from sklearn.svm import SVC, SVR
 from sklearn.neural_network import MLPClassifier, MLPRegressor
+from sklearn.naive_bayes import MultinomialNB
 
 def neg_root_mean_squared_error(y_true, y_pred):
     """Calcule le RMSE négatif pour la maximisation par Optuna."""
@@ -22,7 +23,13 @@ SCORING_MAP = {
 }
 
 def suggest_hyperparameters(trial, model_name):
-    """ Logique de suggestion d'hyperparamètres optimisée. """
+    """
+    Définit l'espace de recherche (search space) pour l'optimisation avec Optuna. 
+    
+    En fonction du modèle sélectionné, elle utilise l'objet 'trial' pour suggérer 
+    des plages de valeurs spécifiques (numériques ou catégories) pour 
+    chaque hyperparamètre.
+    """
     
     if model_name in ['RandomForest', 'RandomForestReg']:
         return {
@@ -31,6 +38,12 @@ def suggest_hyperparameters(trial, model_name):
             'min_samples_split': trial.suggest_int('min_samples_split', 2, 10),
             'criterion': trial.suggest_categorical('criterion', ['gini', 'entropy']) if model_name == 'RandomForest' else 'squared_error',
             'random_state': 42
+        }
+
+    elif model_name == 'MultinomialNB':
+        return {
+            'alpha': trial.suggest_float('alpha', 1e-3, 10.0, log=True),
+            'fit_prior': trial.suggest_categorical('fit_prior', [True, False])
         }
     
     elif model_name == 'LogisticRegression':
@@ -81,9 +94,17 @@ def suggest_hyperparameters(trial, model_name):
     return {}
 
 def get_base_model_class(model_name, is_classification):
-    """ Renvoie la classe Scikit-learn selon le type de problème. """
+    """
+    Assure le mapping (faire de la correspondance) entre le nom du modèle (sous forme de chaîne de caractères) 
+    et sa classe réelle dans Scikit-learn. 
+    
+    Cette fonction est nécessaire pour l'instanciation dynamique (créer un objet à partir d'une clase) : 
+    elle  permet à  l'optimiseur de récupérer le bon constructeur selon que la tâche est une classification
+    ou une régression, afin de créer un nouvel objet modèle à chaque itération de recherche d'hyperparamètres.
+    """
     
     if is_classification:
+        if model_name == 'MultinomialNB': return MultinomialNB
         if model_name == 'RandomForest': return RandomForestClassifier
         if model_name == 'LogisticRegression': return LogisticRegression
         if model_name == 'SVC': return SVC
