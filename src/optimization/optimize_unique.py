@@ -95,7 +95,7 @@ class AutoOptimizer:
         task_type = task_info['type']
         target_metric_name = task_info['metrics'][0] 
         
-        print(f"\nDémarrage de l'optimisation pour le modèle: {model_name} ({n_trials} irérations)")
+        print(f"\nDémarrage de l'optimisation pour le modèle: {model_name} ({n_trials} itérations)")
         
         study = optuna.create_study(direction='maximize', sampler=optuna.samplers.TPESampler())
         study.optimize(
