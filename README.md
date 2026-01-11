@@ -16,7 +16,7 @@ L’objectif est de développer une **pipeline AutoML** permettant d’automatis
 - Optimisation des hyperparamètres (optuna)  
 - Évaluation avec métriques adaptées (accuracy, F1-score, RMSE, etc.)
 - Prédiction automatique sur de nouveaux jeux de données via ```predict()```
-- Interface utilisateur minimale :
+- Interface utilisateur :
 ```python
 import automl
 
