@@ -19,10 +19,12 @@ L’objectif est de développer une **pipeline AutoML** permettant d’automatis
 - Interface utilisateur minimale :
 ```python
 import automl
-data_dest_traindev="/info/corpus/ChallengeMachineLearning/data_test/data.data"
+
+automl = automl.AutoML()
+data_dest_traindev="/info/corpus/ChallengeMachineLearning/data_.../"
 automl.fit(data_dest_traindev)
 automl.eval()
-path_to_testset = "/info/corpus/ChallengeMachineLearning/data_test/data_test.data"
+path_to_testset = "/info/corpus/ChallengeMachineLearning/data_../"
 automl.predict(path_to_testset)
 ```
 

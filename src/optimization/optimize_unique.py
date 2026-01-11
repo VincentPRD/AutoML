@@ -97,7 +97,7 @@ class AutoOptimizer:
         
         print(f"\nDémarrage de l'optimisation pour le modèle: {model_name} ({n_trials} irérations)")
         
-        study = optuna.create_study(direction='maximize')
+        study = optuna.create_study(direction='maximize', sampler=optuna.samplers.TPESampler())
         study.optimize(
             lambda trial: self.objective(
                 trial, X_train, y_train, task_type, target_metric_name, model_name
